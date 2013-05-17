@@ -104,7 +104,6 @@ class MonerisHostedIPN extends CRM_Core_Payment_BaseIPN {
     // make sure the invoice is valid and matches what we have in the contribution record
     $contribution = & $objects['contribution'];
     $input['invoice'] = $privateData['invoiceID'];
-    $input['newInvoice'] = $merchantData['transactionID'];
     $input['trxn_id'] = $merchantData['trxn_id'];
     $input['is_test'] = $privateData['is_test'];
 
@@ -114,20 +113,14 @@ class MonerisHostedIPN extends CRM_Core_Payment_BaseIPN {
       return;
     }
 
-    // lets replace invoice-id with Payment Processor -number because thats what is common and unique
-    $contribution->invoice_id = $input['newInvoice'];
-
     $input['amount'] = $merchantData['PurchaseAmount'];
-
     if ($contribution->total_amount != $input['amount']) {
       CRM_Core_Error::debug_log_message("Amount values dont match between database and IPN request");
       echo "Failure: Amount values dont match between database and IPN request. " . $contribution->total_amount . "/" . $input['amount'] . "<p>";
       return;
     }
 
-    //require_once 'CRM/Core/Transaction.php';
     $transaction = new CRM_Core_Transaction();
-
 
     /*
       Valid-Approved : The transaction was approved and successfully validated
@@ -260,7 +253,7 @@ class MonerisHostedIPN extends CRM_Core_Payment_BaseIPN {
     $qfKey = $rawPostData['rvar_qfKey'];
 
     $privateData = $ids = $objects = array();
-    $privateData['transactionID'] = $rawPostData['transactionKey'];
+    $privateData['transactionID'] = $rawPostData['bank_transaction_id'];
     $privateData['contributionID'] = $rawPostData['rvar_contributionID'];
     $privateData['contactID'] = $rawPostData['rvar_contactID'];
     $privateData['invoiceID'] = $rawPostData['response_order_id'];
@@ -302,10 +295,10 @@ class MonerisHostedIPN extends CRM_Core_Payment_BaseIPN {
     $merchantData = array();
     $merchantData['trxn_id'] = $rawPostData['bank_transaction_id'];
     $merchantData['PurchaseAmount'] = $verifyTrans['amount'];
-    $merchantData['transactionID'] = $verifyTrans['transactionKey'];
+    //$merchantData['transactionID'] = $verifyTrans['txn_num'];
     $merchantData['status'] = $verifyTrans['status'];
 
-    if ($verifyTrans['response_code'] < 50 && $rawPostData['result'] == 1) {
+    if ($verifyTrans['response_code'] < 50 && $rawPostData['result'] == 1 && $rawPostData['txn_num'] == $verifyTrans['txn_num']) {
       $success = TRUE;
     }
 
