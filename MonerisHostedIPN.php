@@ -125,7 +125,7 @@ class MonerisHostedIPN extends CRM_Core_Payment_BaseIPN {
       return;
     }
 
-    require_once 'CRM/Core/Transaction.php';
+    //require_once 'CRM/Core/Transaction.php';
     $transaction = new CRM_Core_Transaction();
 
 
@@ -228,7 +228,7 @@ class MonerisHostedIPN extends CRM_Core_Payment_BaseIPN {
 
       // we are in event mode
       // make sure event exists and is valid
-      require_once 'CRM/Event/DAO/Event.php';
+      //require_once 'CRM/Event/DAO/Event.php';
       $event = & new CRM_Event_DAO_Event();
       $event->id = $eventID;
 

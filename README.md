@@ -1,4 +1,4 @@
-com.webaccessglobal.moneris
+com.webaccessglobal.monerishosted
 ===========================
 
-Moneris payment processor extension for CiviCRM
+Moneris hosted payment processor extension for CiviCRM
