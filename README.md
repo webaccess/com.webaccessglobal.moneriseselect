@@ -1,5 +1,6 @@
-com.webaccessglobal.monerishosted
-===========================
+===================================
+Moneris eSelect Payment Processor
+===================================
 
 Moneris hosted payment processor extension for CiviCRM
 

@@ -19,7 +19,7 @@ class com_webaccessglobal_Moneriseselect extends CRM_Core_Payment {
    * @var object
    * @static
    */
-  protected static $_mode = null;
+  protected static $_mode = NULL;
 
   /**
    * Constructor
@@ -86,8 +86,9 @@ class com_webaccessglobal_Moneriseselect extends CRM_Core_Payment {
       'rvar_module' => $component,
     );
 
-    if (array_key_exists('email-5', $params) || array_key_exists('email-Primary', $params))
+    if (array_key_exists('email-5', $params) || array_key_exists('email-Primary', $params)) {
       $data['email'] = array_key_exists('email-5', $params) ? $params['email-5'] : $params['email-Primary'];
+    }
 
     if ($component == 'event') {
       $data['rvar_eventID'] = $params['eventID'];

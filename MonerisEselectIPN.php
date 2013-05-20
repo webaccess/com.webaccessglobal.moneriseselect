@@ -9,7 +9,7 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
    * @var object
    * @static
    */
-  private static $_singleton = null;
+  private static $_singleton = NULL;
 
   /**
    * mode of operation: live or test
@@ -17,11 +17,11 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
    * @var object
    * @static
    */
-  protected static $_mode = null;
+  protected static $_mode = NULL;
 
-  static function retrieve($name, $type, $object, $abort = true) {
+  static function retrieve($name, $type, $object, $abort = TRUE) {
     $value = CRM_Utils_Array::value($name, $object);
-    if ($abort && $value === null) {
+    if ($abort && $value === NULL) {
       CRM_Core_Error::debug_log_message("Could not find an entry for $name");
       echo "Failure: Missing Parameter - " . $name . "<p>";
       exit();
@@ -61,7 +61,7 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
    * @static
    */
   static function &singleton($mode, $component, &$paymentProcessor) {
-    if (self::$_singleton === null) {
+    if (self::$_singleton === NULL) {
       self::$_singleton = new MonerisEselectIPN($mode, $paymentProcessor);
     }
     return self::$_singleton;
@@ -70,9 +70,9 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * The function gets called when a new order takes place.
    *
-   * @param array  $privateData  contains the CiviCRM related data
+   * @param array $privateData  contains the CiviCRM related data
    * @param string $component    the CiviCRM component
-   * @param array  $merchantData contains the Merchant related data
+   * @param array $merchantData contains the Merchant related data
    *
    * @return void
    *
@@ -81,12 +81,12 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
     $ids = $input = $params = array();
 
     $input['component'] = strtolower($component);
-    $ids['contact'] = self::retrieve('contactID', 'Integer', $privateData, true);
-    $ids['contribution'] = self::retrieve('contributionID', 'Integer', $privateData, true);
+    $ids['contact'] = self::retrieve('contactID', 'Integer', $privateData, TRUE);
+    $ids['contribution'] = self::retrieve('contributionID', 'Integer', $privateData, TRUE);
 
     if ($input['component'] == "event") {
-      $ids['event'] = self::retrieve('eventID', 'Integer', $privateData, true);
-      $ids['participant'] = self::retrieve('participantID', 'Integer', $privateData, true);
+      $ids['event'] = self::retrieve('eventID', 'Integer', $privateData, TRUE);
+      $ids['participant'] = self::retrieve('participantID', 'Integer', $privateData, TRUE);
       $ids['membership'] = NULL;
     }
     else {
@@ -96,9 +96,9 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
       $ids['contributionRecur'] = self::retrieve('contributionRecurID', 'Integer', $privateData, FALSE);
     }
 
-    $ids['contributionRecur'] = $ids['contributionPage'] = null;
+    $ids['contributionRecur'] = $ids['contributionPage'] = NULL;
     if (!$this->validateData($input, $ids, $objects)) {
-      return false;
+      return FALSE;
     }
 
     // make sure the invoice is valid and matches what we have in the contribution record
@@ -146,7 +146,7 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
       $transaction->commit();
       CRM_Core_Error::debug_log_message("returning since contribution has already been handled");
       echo "Success: Contribution has already been handled<p>";
-      return true;
+      return TRUE;
     }
     else {
 
@@ -159,27 +159,27 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     $this->completeTransaction($input, $ids, $objects, $transaction);
-    return true;
+    return TRUE;
   }
 
   /**
    * The function returns the component(Event/Contribute..)and whether it is Test or not
    *
-   * @param array   $privateData    contains the name-value pairs of transaction related data
+   * @param array $privateData    contains the name-value pairs of transaction related data
    *
    * @return array context of this call (test, component, payment processor id)
    * @static
    */
   static function getContext($privateData) {
 
-    $component = null;
-    $isTest = null;
+    $component = NULL;
+    $isTest = NULL;
 
     $contributionID = $privateData['contributionID'];
     $contribution = & new CRM_Contribute_DAO_Contribution();
     $contribution->id = $contributionID;
 
-    if (!$contribution->find(true)) {
+    if (!$contribution->find(TRUE)) {
       CRM_Core_Error::debug_log_message("Could not find contribution record: $contributionID");
       echo "Failure: Could not find contribution record for $contributionID<p>";
       exit();
@@ -188,8 +188,10 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
     if (stristr($contribution->source, 'Online Contribution')) {
       $component = 'contribute';
     }
-    else if (stristr($contribution->source, 'Online Event Registration')) {
-      $component = 'event';
+    else {
+      if (stristr($contribution->source, 'Online Event Registration')) {
+        $component = 'event';
+      }
     }
     $isTest = $contribution->is_test;
 
@@ -221,7 +223,7 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
       $event = & new CRM_Event_DAO_Event();
       $event->id = $eventID;
 
-      if (!$event->find(true)) {
+      if (!$event->find(TRUE)) {
         CRM_Core_Error::debug_log_message("Could not find event: $eventID");
         echo "Failure: Could not find event: $eventID<p>";
         exit();
@@ -243,7 +245,7 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
   function main($rawPostData) {
     CRM_Core_Error::debug_var('$rawPostData', $rawPostData);
     $config = CRM_Core_Config::singleton();
-    $success = false;
+    $success = FALSE;
 
     $component = $rawPostData['rvar_module'];
     $qfKey = $rawPostData['rvar_qfKey'];
@@ -258,10 +260,12 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
       $privateData['participantID'] = $rawPostData['rvar_participantID'];
       $privateData['eventID'] = $rawPostData['rvar_eventID'];
     }
-    else if ($component == "contribute") {
-      $privateData["membershipID"] = array_key_exists('rvar_membershipID', $rawPostData) ? $rawPostData['rvar_membershipID'] : '';
-      $privateData["relatedContactID"] = array_key_exists('rvar_relatedContactID', $rawPostData) ? $rawPostData['rvar_relatedContactID'] : '';
-      $privateData["onbehalf_dupe_alert"] = array_key_exists('rvar_onbehalf_dupe_alert', $rawPostData) ? $rawPostData['rvar_onbehalf_dupe_alert'] : '';
+    else {
+      if ($component == "contribute") {
+        $privateData["membershipID"] = array_key_exists('rvar_membershipID', $rawPostData) ? $rawPostData['rvar_membershipID'] : '';
+        $privateData["relatedContactID"] = array_key_exists('rvar_relatedContactID', $rawPostData) ? $rawPostData['rvar_relatedContactID'] : '';
+        $privateData["onbehalf_dupe_alert"] = array_key_exists('rvar_onbehalf_dupe_alert', $rawPostData) ? $rawPostData['rvar_onbehalf_dupe_alert'] : '';
+      }
     }
 
     list ($mode, $component, $duplicateTransaction) = self::getContext($privateData);
@@ -307,17 +311,19 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
       $baseURL = 'civicrm/event/register';
       $query = $success ? "_qf_ThankYou_display=true&qfKey={$qfKey}" : "_qf_Register_display=1&cancel=1&qfKey={$qfKey}";
     }
-    else if ($component == "contribute") {
-      $baseURL = 'civicrm/contribute/transact';
-      $query = $success ? "_qf_ThankYou_display=true&qfKey={$qfKey}" : "_qf_Main_display=1&cancel=1&qfKey={$qfKey}";
-    }
     else {
-      // Invalid component
-      CRM_Core_Error::fatal(ts('Invalid component "' . $component . '" selected.'));
-      exit();
+      if ($component == "contribute") {
+        $baseURL = 'civicrm/contribute/transact';
+        $query = $success ? "_qf_ThankYou_display=true&qfKey={$qfKey}" : "_qf_Main_display=1&cancel=1&qfKey={$qfKey}";
+      }
+      else {
+        // Invalid component
+        CRM_Core_Error::fatal(ts('Invalid component "' . $component . '" selected.'));
+        exit();
+      }
     }
 
-    $finalURL = CRM_Utils_System::url($baseURL, $query, false, null, false);
+    $finalURL = CRM_Utils_System::url($baseURL, $query, FALSE, NULL, FALSE);
     CRM_Utils_System::redirect($finalURL);
   }
 
@@ -344,7 +350,7 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
     curl_setopt($submit, CURLOPT_URL, $url);
     curl_setopt($submit, CURLOPT_TIMEOUT, 10);
     curl_setopt($submit, CURLOPT_POSTFIELDS, $nvpreq);
-    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, FALSE);
     $response = curl_exec($submit);
 
     if (!$response) {
@@ -353,19 +359,20 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
     curl_close($submit);
 
     $xmlObj = simplexml_load_string($response);
-    foreach ((array) $xmlObj as $index => $value)
-      $result[$index] = ( is_object($value) ) ? (array) $value : $value;
+    foreach ((array) $xmlObj as $index => $value) {
+      $result[$index] = (is_object($value)) ? (array) $value : $value;
+    }
 
     return $result;
   }
 
-  function &error($errorCode = null, $errorMessage = null) {
+  function &error($errorCode = NULL, $errorMessage = NULL) {
     $e = & CRM_Core_Error::singleton();
     if ($errorCode) {
-      $e->push($errorCode, 0, null, $errorMessage);
+      $e->push($errorCode, 0, NULL, $errorMessage);
     }
     else {
-      $e->push(9001, 0, null, 'Unknowns System Error.');
+      $e->push(9001, 0, NULL, 'Unknowns System Error.');
     }
     return $e;
   }
