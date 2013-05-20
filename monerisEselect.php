@@ -1,6 +1,6 @@
 <?php
 
-class com_webaccessglobal_monerishosted extends CRM_Core_Payment {
+class com_webaccessglobal_monerisEselect extends CRM_Core_Payment {
 
   CONST CHARSET = 'UFT-8';
 
@@ -12,6 +12,7 @@ class com_webaccessglobal_monerishosted extends CRM_Core_Payment {
    * @static
    */
   static private $_singleton = NULL;
+
   /**
    * mode of operation: live or test
    *
@@ -30,7 +31,7 @@ class com_webaccessglobal_monerishosted extends CRM_Core_Payment {
   function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
-    $this->_processorName = ts('MonerisHosted');
+    $this->_processorName = ts('MonerisEselect');
   }
 
   /**
@@ -45,7 +46,7 @@ class com_webaccessglobal_monerishosted extends CRM_Core_Payment {
   static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
     if (!isset(self::$_singleton[$processorName]) || self::$_singleton[$processorName] === NULL) {
-      self::$_singleton[$processorName] = new com_webaccessglobal_monerishosted($mode, $paymentProcessor);
+      self::$_singleton[$processorName] = new com_webaccessglobal_monerisEselect($mode, $paymentProcessor);
     }
     return self::$_singleton[$processorName];
   }
@@ -78,7 +79,6 @@ class com_webaccessglobal_monerishosted extends CRM_Core_Payment {
       'quantity1' => 1,
       'price1' => sprintf('%01.2f', $params['amount']),
       'subtotal1' => sprintf('%01.2f', $params['amount']),
-      'note' => 'Test | Note | Merchant',
       'rvar_qfKey' => $params['qfKey'],
       'rvar_contactID' => $params['contactID'],
       'rvar_contributionID' => $params['contributionID'],
@@ -245,10 +245,9 @@ class com_webaccessglobal_monerishosted extends CRM_Core_Payment {
    * Handle return response from payment processor
    */
   function handlePaymentNotification() {
-    require_once 'MonerisHostedIPN.php';
-    $payFlowLinkIPN = new MonerisHostedIPN($this->_mode, $this->_paymentProcessor);
-    $httpRequest = $_POST;
-    $payFlowLinkIPN->main($httpRequest);
+    require_once 'MonerisEselectIPN.php';
+    $MonerisEselectIPN = new MonerisEselectIPN($this->_mode, $this->_paymentProcessor);
+    $MonerisEselectIPN->main($_POST);
   }
 
 }

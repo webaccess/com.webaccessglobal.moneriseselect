@@ -1,6 +1,6 @@
 <?php
 
-class MonerisHostedIPN extends CRM_Core_Payment_BaseIPN {
+class MonerisEselectIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
    * We only need one instance of this object. So we use the singleton
@@ -62,7 +62,7 @@ class MonerisHostedIPN extends CRM_Core_Payment_BaseIPN {
    */
   static function &singleton($mode, $component, &$paymentProcessor) {
     if (self::$_singleton === null) {
-      self::$_singleton = new MonerisHostedIPN($mode, $paymentProcessor);
+      self::$_singleton = new MonerisEselectIPN($mode, $paymentProcessor);
     }
     return self::$_singleton;
   }
@@ -106,19 +106,7 @@ class MonerisHostedIPN extends CRM_Core_Payment_BaseIPN {
     $input['invoice'] = $privateData['invoiceID'];
     $input['trxn_id'] = $merchantData['trxn_id'];
     $input['is_test'] = $privateData['is_test'];
-
-    if ($contribution->invoice_id != $input['invoice']) {
-      CRM_Core_Error::debug_log_message("Invoice values dont match between database and IPN request");
-      echo "Failure: Invoice values dont match between database and IPN request<p>";
-      return;
-    }
-
     $input['amount'] = $merchantData['PurchaseAmount'];
-    if ($contribution->total_amount != $input['amount']) {
-      CRM_Core_Error::debug_log_message("Amount values dont match between database and IPN request");
-      echo "Failure: Amount values dont match between database and IPN request. " . $contribution->total_amount . "/" . $input['amount'] . "<p>";
-      return;
-    }
 
     $transaction = new CRM_Core_Transaction();
 
@@ -134,15 +122,23 @@ class MonerisHostedIPN extends CRM_Core_Payment_BaseIPN {
     switch ($merchantData['status']) {
       case 'Invalid-ReConfirmed':
         break;
-      // unhandled
       case 'Invalid':
       case 'Invalid-Bad_Source':
-        return $this->unhandled($objects, $transaction);
-        break;
-      // failed
       case 'Valid-Declined':
         return $this->failed($objects, $transaction);
         break;
+    }
+
+    if ($contribution->invoice_id != $input['invoice']) {
+      CRM_Core_Error::debug_log_message("Invoice values dont match between database and IPN request");
+      echo "Failure: Invoice values dont match between database and IPN request<p>";
+      return;
+    }
+
+    if ($contribution->total_amount != $input['amount']) {
+      CRM_Core_Error::debug_log_message("Amount values dont match between database and IPN request");
+      echo "Failure: Amount values dont match between database and IPN request. " . $contribution->total_amount . "/" . $input['amount'] . "<p>";
+      return;
     }
 
     // check if contribution is already completed, if so we ignore this ipn
@@ -358,7 +354,7 @@ class MonerisHostedIPN extends CRM_Core_Payment_BaseIPN {
 
     $xmlObj = simplexml_load_string($response);
     foreach ((array) $xmlObj as $index => $value)
-      $result[$index] = ( is_object($value) ) ? xml2array($value) : $value;
+      $result[$index] = ( is_object($value) ) ? (array) $value : $value;
 
     return $result;
   }
