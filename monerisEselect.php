@@ -1,6 +1,6 @@
 <?php
 
-class com_webaccessglobal_monerisEselect extends CRM_Core_Payment {
+class com_webaccessglobal_Moneriseselect extends CRM_Core_Payment {
 
   CONST CHARSET = 'UFT-8';
 
@@ -31,7 +31,7 @@ class com_webaccessglobal_monerisEselect extends CRM_Core_Payment {
   function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
-    $this->_processorName = ts('MonerisEselect');
+    $this->_processorName = ts('Moneris eSelect');
   }
 
   /**
@@ -246,8 +246,8 @@ class com_webaccessglobal_monerisEselect extends CRM_Core_Payment {
    */
   function handlePaymentNotification() {
     require_once 'MonerisEselectIPN.php';
-    $MonerisEselectIPN = new MonerisEselectIPN($this->_mode, $this->_paymentProcessor);
-    $MonerisEselectIPN->main($_POST);
+    $moneriseselectIPN = new MoneriseselectIPN($this->_mode, $this->_paymentProcessor);
+    $moneriseselectIPN->main($_POST);
   }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-class MonerisEselectIPN extends CRM_Core_Payment_BaseIPN {
+class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
    * We only need one instance of this object. So we use the singleton
