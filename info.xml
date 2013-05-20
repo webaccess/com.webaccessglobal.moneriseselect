@@ -2,7 +2,7 @@
  <extension key="com.webaccessglobal.monerisEselect" type="payment">
 <downloadUrl>https://codeload.github.com/webaccess/com.webaccessglobal.moneris-eselect/zip/master</downloadUrl>
   <file>monerisEselect</file>
-  <name>Moneris-Eselect</name>
+  <name>MonerisEselect</name>
   <description>Eselect Moneris hosted payment processor for CiviCRM</description>
   <urls>
     <url desc="Main Extension Page"></url>
