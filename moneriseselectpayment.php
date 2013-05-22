@@ -245,7 +245,7 @@ class com_webaccessglobal_moneriseselect extends CRM_Core_Payment {
    * Handle return response from payment processor
    */
   function handlePaymentNotification() {
-    require_once 'com.webaccessglobal.moneriseselectIPN.php';
+    require_once 'moneriseselectipn.php';
     $MonerisEselectIPN = new com_webaccessglobal_moneriseselectIPN($this->_mode, $this->_paymentProcessor);
     $MonerisEselectIPN->main($_POST);
   }
