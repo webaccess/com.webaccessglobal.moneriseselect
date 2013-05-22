@@ -3,7 +3,7 @@
   <downloadUrl>https://codeload.github.com/webaccess/com.webaccessglobal.moneris-eselect/zip/master</downloadUrl>
   <file>moneriseselect</file>
   <name>MonerisEselect</name>
-  <label>Moneris Eselect<label>
+  <label>Moneris Eselect Hosted</label>
   <description>Eselect Moneris hosted payment processor for CiviCRM</description>
   <urls>
     <url desc="Main Extension Page">test</url>
