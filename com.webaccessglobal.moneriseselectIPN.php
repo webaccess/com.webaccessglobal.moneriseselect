@@ -1,6 +1,6 @@
 <?php
 
-class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
+class com_webaccessglobal_moneriseselectIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
    * We only need one instance of this object. So we use the singleton
@@ -9,7 +9,7 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
    * @var object
    * @static
    */
-  private static $_singleton = NULL;
+  private static $_singleton = null;
 
   /**
    * mode of operation: live or test
@@ -17,11 +17,11 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
    * @var object
    * @static
    */
-  protected static $_mode = NULL;
+  protected static $_mode = null;
 
-  static function retrieve($name, $type, $object, $abort = TRUE) {
+  static function retrieve($name, $type, $object, $abort = true) {
     $value = CRM_Utils_Array::value($name, $object);
-    if ($abort && $value === NULL) {
+    if ($abort && $value === null) {
       CRM_Core_Error::debug_log_message("Could not find an entry for $name");
       echo "Failure: Missing Parameter - " . $name . "<p>";
       exit();
@@ -61,8 +61,8 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
    * @static
    */
   static function &singleton($mode, $component, &$paymentProcessor) {
-    if (self::$_singleton === NULL) {
-      self::$_singleton = new MonerisEselectIPN($mode, $paymentProcessor);
+    if (self::$_singleton === null) {
+      self::$_singleton = new com_webaccessglobal_moneriseselectIPN($mode, $paymentProcessor);
     }
     return self::$_singleton;
   }
@@ -70,23 +70,23 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * The function gets called when a new order takes place.
    *
-   * @param array $privateData  contains the CiviCRM related data
+   * @param array  $privateData  contains the CiviCRM related data
    * @param string $component    the CiviCRM component
-   * @param array $merchantData contains the Merchant related data
+   * @param array  $moneriseselectData contains the Merchant related data
    *
    * @return void
    *
    */
-  function newOrderNotify($success, $privateData, $component, $merchantData) {
+  function newOrderNotify($success, $privateData, $component, $moneriseselectData) {
     $ids = $input = $params = array();
 
     $input['component'] = strtolower($component);
-    $ids['contact'] = self::retrieve('contactID', 'Integer', $privateData, TRUE);
-    $ids['contribution'] = self::retrieve('contributionID', 'Integer', $privateData, TRUE);
+    $ids['contact'] = self::retrieve('contactID', 'Integer', $privateData, true);
+    $ids['contribution'] = self::retrieve('contributionID', 'Integer', $privateData, true);
 
     if ($input['component'] == "event") {
-      $ids['event'] = self::retrieve('eventID', 'Integer', $privateData, TRUE);
-      $ids['participant'] = self::retrieve('participantID', 'Integer', $privateData, TRUE);
+      $ids['event'] = self::retrieve('eventID', 'Integer', $privateData, true);
+      $ids['participant'] = self::retrieve('participantID', 'Integer', $privateData, true);
       $ids['membership'] = NULL;
     }
     else {
@@ -96,17 +96,17 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
       $ids['contributionRecur'] = self::retrieve('contributionRecurID', 'Integer', $privateData, FALSE);
     }
 
-    $ids['contributionRecur'] = $ids['contributionPage'] = NULL;
+    $ids['contributionRecur'] = $ids['contributionPage'] = null;
     if (!$this->validateData($input, $ids, $objects)) {
-      return FALSE;
+      return false;
     }
 
     // make sure the invoice is valid and matches what we have in the contribution record
     $contribution = & $objects['contribution'];
     $input['invoice'] = $privateData['invoiceID'];
-    $input['trxn_id'] = $merchantData['trxn_id'];
+    $input['trxn_id'] = $moneriseselectData['trxn_id'];
     $input['is_test'] = $privateData['is_test'];
-    $input['amount'] = $merchantData['PurchaseAmount'];
+    $input['amount'] = $moneriseselectData['PurchaseAmount'];
 
     $transaction = new CRM_Core_Transaction();
 
@@ -119,10 +119,12 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
       Invalid-Bad_Source : The Referring URL is not correct, validation failed
      */
 
-    switch ($merchantData['status']) {
+    switch ($moneriseselectData['status']) {
       case 'Invalid-ReConfirmed':
         break;
       case 'Invalid':
+        return $this->cancelled($objects, $transaction);
+        break;
       case 'Invalid-Bad_Source':
       case 'Valid-Declined':
         return $this->failed($objects, $transaction);
@@ -146,7 +148,7 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
       $transaction->commit();
       CRM_Core_Error::debug_log_message("returning since contribution has already been handled");
       echo "Success: Contribution has already been handled<p>";
-      return TRUE;
+      return true;
     }
     else {
 
@@ -159,27 +161,27 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
     }
 
     $this->completeTransaction($input, $ids, $objects, $transaction);
-    return TRUE;
+    return true;
   }
 
   /**
    * The function returns the component(Event/Contribute..)and whether it is Test or not
    *
-   * @param array $privateData    contains the name-value pairs of transaction related data
+   * @param array   $privateData    contains the name-value pairs of transaction related data
    *
    * @return array context of this call (test, component, payment processor id)
    * @static
    */
   static function getContext($privateData) {
 
-    $component = NULL;
-    $isTest = NULL;
+    $component = null;
+    $isTest = null;
 
     $contributionID = $privateData['contributionID'];
     $contribution = & new CRM_Contribute_DAO_Contribution();
     $contribution->id = $contributionID;
 
-    if (!$contribution->find(TRUE)) {
+    if (!$contribution->find(true)) {
       CRM_Core_Error::debug_log_message("Could not find contribution record: $contributionID");
       echo "Failure: Could not find contribution record for $contributionID<p>";
       exit();
@@ -188,10 +190,8 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
     if (stristr($contribution->source, 'Online Contribution')) {
       $component = 'contribute';
     }
-    else {
-      if (stristr($contribution->source, 'Online Event Registration')) {
-        $component = 'event';
-      }
+    else if (stristr($contribution->source, 'Online Event Registration')) {
+      $component = 'event';
     }
     $isTest = $contribution->is_test;
 
@@ -223,7 +223,7 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
       $event = & new CRM_Event_DAO_Event();
       $event->id = $eventID;
 
-      if (!$event->find(TRUE)) {
+      if (!$event->find(true)) {
         CRM_Core_Error::debug_log_message("Could not find event: $eventID");
         echo "Failure: Could not find event: $eventID<p>";
         exit();
@@ -242,30 +242,28 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
    * notification or request sent by the payment processor.
    * hex string from paymentexpress is passed to this function as hex string.
    */
-  function main($rawPostData) {
-    CRM_Core_Error::debug_var('$rawPostData', $rawPostData);
+  function main($moneriseselectPostData) {
+    CRM_Core_Error::debug_var('$moneriseselectPostData', $moneriseselectPostData);
     $config = CRM_Core_Config::singleton();
-    $success = FALSE;
+    $success = false;
 
-    $component = $rawPostData['rvar_module'];
-    $qfKey = $rawPostData['rvar_qfKey'];
+    $component = $moneriseselectPostData['rvar_module'];
+    $qfKey = $moneriseselectPostData['rvar_qfKey'];
 
     $privateData = $ids = $objects = array();
-    $privateData['transactionID'] = $rawPostData['bank_transaction_id'];
-    $privateData['contributionID'] = $rawPostData['rvar_contributionID'];
-    $privateData['contactID'] = $rawPostData['rvar_contactID'];
-    $privateData['invoiceID'] = $rawPostData['response_order_id'];
+    $privateData['transactionID'] = $moneriseselectPostData['bank_transaction_id'];
+    $privateData['contributionID'] = $moneriseselectPostData['rvar_contributionID'];
+    $privateData['contactID'] = $moneriseselectPostData['rvar_contactID'];
+    $privateData['invoiceID'] = $moneriseselectPostData['response_order_id'];
 
     if ($component == "event") {
-      $privateData['participantID'] = $rawPostData['rvar_participantID'];
-      $privateData['eventID'] = $rawPostData['rvar_eventID'];
+      $privateData['participantID'] = $moneriseselectPostData['rvar_participantID'];
+      $privateData['eventID'] = $moneriseselectPostData['rvar_eventID'];
     }
-    else {
-      if ($component == "contribute") {
-        $privateData["membershipID"] = array_key_exists('rvar_membershipID', $rawPostData) ? $rawPostData['rvar_membershipID'] : '';
-        $privateData["relatedContactID"] = array_key_exists('rvar_relatedContactID', $rawPostData) ? $rawPostData['rvar_relatedContactID'] : '';
-        $privateData["onbehalf_dupe_alert"] = array_key_exists('rvar_onbehalf_dupe_alert', $rawPostData) ? $rawPostData['rvar_onbehalf_dupe_alert'] : '';
-      }
+    else if ($component == "contribute") {
+      $privateData["membershipID"] = array_key_exists('rvar_membershipID', $moneriseselectPostData) ? $moneriseselectPostData['rvar_membershipID'] : '';
+      $privateData["relatedContactID"] = array_key_exists('rvar_relatedContactID', $moneriseselectPostData) ? $moneriseselectPostData['rvar_relatedContactID'] : '';
+      $privateData["onbehalf_dupe_alert"] = array_key_exists('rvar_onbehalf_dupe_alert', $moneriseselectPostData) ? $moneriseselectPostData['rvar_onbehalf_dupe_alert'] : '';
     }
 
     list ($mode, $component, $duplicateTransaction) = self::getContext($privateData);
@@ -284,26 +282,26 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
      * Verification response to ensure authenticity.
      */
     $url = $paymentProcessor['url_site'];
-    $params['ps_store_id'] = $paymentProcessor['signature'];
-    $params['hpp_key'] = $paymentProcessor['user_name'];
-    $params['transactionKey'] = $rawPostData['transactionKey'];
+    $moneriseselectParams['ps_store_id'] = $paymentProcessor['signature'];
+    $moneriseselectParams['hpp_key'] = $paymentProcessor['user_name'];
+    $moneriseselectParams['transactionKey'] = $moneriseselectPostData['transactionKey'];
 
-    $verifyTrans = $this->_transactionVerification($params, $url);
+    $verifyTrans = $this->_transactionVerification($moneriseselectParams, $url);
     CRM_Core_Error::debug_var('$verifyTrans', $verifyTrans);
 
 
-    $merchantData = array();
-    $merchantData['trxn_id'] = $rawPostData['bank_transaction_id'];
-    $merchantData['PurchaseAmount'] = $verifyTrans['amount'];
-    //$merchantData['transactionID'] = $verifyTrans['txn_num'];
-    $merchantData['status'] = $verifyTrans['status'];
+    $moneriseselectData = array();
+    $moneriseselectData['trxn_id'] = $moneriseselectPostData['bank_transaction_id'];
+    $moneriseselectData['PurchaseAmount'] = $verifyTrans['amount'];
+    //$moneriseselectData['transactionID'] = $verifyTrans['txn_num'];
+    $moneriseselectData['status'] = $verifyTrans['status'];
 
-    if ($verifyTrans['response_code'] < 50 && $rawPostData['result'] == 1 && $rawPostData['txn_num'] == $verifyTrans['txn_num']) {
+    if ($verifyTrans['response_code'] < 50 && $moneriseselectPostData['result'] == 1 && $moneriseselectPostData['txn_num'] == $verifyTrans['txn_num']) {
       $success = TRUE;
     }
 
     if ($duplicateTransaction == 0) {
-      $ipn->newOrderNotify($success, $privateData, $component, $merchantData);
+      $ipn->newOrderNotify($success, $privateData, $component, $moneriseselectData);
     }
 
     //Check status and take appropriate action
@@ -311,19 +309,17 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
       $baseURL = 'civicrm/event/register';
       $query = $success ? "_qf_ThankYou_display=true&qfKey={$qfKey}" : "_qf_Register_display=1&cancel=1&qfKey={$qfKey}";
     }
+    else if ($component == "contribute") {
+      $baseURL = 'civicrm/contribute/transact';
+      $query = $success ? "_qf_ThankYou_display=true&qfKey={$qfKey}" : "_qf_Main_display=1&cancel=1&qfKey={$qfKey}";
+    }
     else {
-      if ($component == "contribute") {
-        $baseURL = 'civicrm/contribute/transact';
-        $query = $success ? "_qf_ThankYou_display=true&qfKey={$qfKey}" : "_qf_Main_display=1&cancel=1&qfKey={$qfKey}";
-      }
-      else {
-        // Invalid component
-        CRM_Core_Error::fatal(ts('Invalid component "' . $component . '" selected.'));
-        exit();
-      }
+      // Invalid component
+      CRM_Core_Error::fatal(ts('Invalid component "' . $component . '" selected.'));
+      exit();
     }
 
-    $finalURL = CRM_Utils_System::url($baseURL, $query, FALSE, NULL, FALSE);
+    $finalURL = CRM_Utils_System::url($baseURL, $query, false, null, false);
     CRM_Utils_System::redirect($finalURL);
   }
 
@@ -350,7 +346,7 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
     curl_setopt($submit, CURLOPT_URL, $url);
     curl_setopt($submit, CURLOPT_TIMEOUT, 10);
     curl_setopt($submit, CURLOPT_POSTFIELDS, $nvpreq);
-    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, FALSE);
+    curl_setopt($submit, CURLOPT_SSL_VERIFYPEER, false);
     $response = curl_exec($submit);
 
     if (!$response) {
@@ -359,20 +355,19 @@ class MoneriseselectIPN extends CRM_Core_Payment_BaseIPN {
     curl_close($submit);
 
     $xmlObj = simplexml_load_string($response);
-    foreach ((array) $xmlObj as $index => $value) {
-      $result[$index] = (is_object($value)) ? (array) $value : $value;
-    }
+    foreach ((array) $xmlObj as $index => $value)
+      $result[$index] = ( is_object($value) ) ? (array) $value : $value;
 
     return $result;
   }
 
-  function &error($errorCode = NULL, $errorMessage = NULL) {
+  function &error($errorCode = null, $errorMessage = null) {
     $e = & CRM_Core_Error::singleton();
     if ($errorCode) {
-      $e->push($errorCode, 0, NULL, $errorMessage);
+      $e->push($errorCode, 0, null, $errorMessage);
     }
     else {
-      $e->push(9001, 0, NULL, 'Unknowns System Error.');
+      $e->push(9001, 0, null, 'Unknowns System Error.');
     }
     return $e;
   }

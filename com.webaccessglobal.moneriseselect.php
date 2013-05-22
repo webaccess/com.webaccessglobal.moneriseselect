@@ -1,6 +1,6 @@
 <?php
 
-class com_webaccessglobal_Moneriseselect extends CRM_Core_Payment {
+class com_webaccessglobal_moneriseselect extends CRM_Core_Payment {
 
   CONST CHARSET = 'UFT-8';
 
@@ -19,7 +19,7 @@ class com_webaccessglobal_Moneriseselect extends CRM_Core_Payment {
    * @var object
    * @static
    */
-  protected static $_mode = NULL;
+  protected static $_mode = null;
 
   /**
    * Constructor
@@ -31,7 +31,7 @@ class com_webaccessglobal_Moneriseselect extends CRM_Core_Payment {
   function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
-    $this->_processorName = ts('Moneris eSelect');
+    $this->_processorName = ts('MonerisEselect');
   }
 
   /**
@@ -46,7 +46,7 @@ class com_webaccessglobal_Moneriseselect extends CRM_Core_Payment {
   static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
     if (!isset(self::$_singleton[$processorName]) || self::$_singleton[$processorName] === NULL) {
-      self::$_singleton[$processorName] = new com_webaccessglobal_monerisEselect($mode, $paymentProcessor);
+      self::$_singleton[$processorName] = new com_webaccessglobal_moneriseselect($mode, $paymentProcessor);
     }
     return self::$_singleton[$processorName];
   }
@@ -86,9 +86,8 @@ class com_webaccessglobal_Moneriseselect extends CRM_Core_Payment {
       'rvar_module' => $component,
     );
 
-    if (array_key_exists('email-5', $params) || array_key_exists('email-Primary', $params)) {
+    if (array_key_exists('email-5', $params) || array_key_exists('email-Primary', $params))
       $data['email'] = array_key_exists('email-5', $params) ? $params['email-5'] : $params['email-Primary'];
-    }
 
     if ($component == 'event') {
       $data['rvar_eventID'] = $params['eventID'];
@@ -246,9 +245,9 @@ class com_webaccessglobal_Moneriseselect extends CRM_Core_Payment {
    * Handle return response from payment processor
    */
   function handlePaymentNotification() {
-    require_once 'MonerisEselectIPN.php';
-    $moneriseselectIPN = new MoneriseselectIPN($this->_mode, $this->_paymentProcessor);
-    $moneriseselectIPN->main($_POST);
+    require_once 'com.webaccessglobal.moneriseselectIPN.php';
+    $MonerisEselectIPN = new com_webaccessglobal_moneriseselectIPN($this->_mode, $this->_paymentProcessor);
+    $MonerisEselectIPN->main($_POST);
   }
 
 }
