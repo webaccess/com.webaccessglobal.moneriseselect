@@ -22,6 +22,6 @@
   </compatibility>
   <comments>test</comments>
   <civix>
-    <namespace>CRM/Stripe</namespace>
+    <namespace>CRM</namespace>
   </civix>
 </extension>
