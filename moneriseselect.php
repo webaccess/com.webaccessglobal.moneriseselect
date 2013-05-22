@@ -1,7 +1,7 @@
 <?php
 
 require_once 'moneriseselect.civix.php';
-require_once 'com.webaccessglobal.moneriseselect.php';
+require_once 'moneriseselectpayment.php';
 /**
  * Implementation of hook_civicrm_config
  */
