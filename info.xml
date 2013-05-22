@@ -1,44 +1,26 @@
 <?xml version="1.0"?>
-<extension key="com.webaccessglobal.moneris-eselect" type="payment">
+<extension key="com.webaccessglobal.moneriseselect" type="module">
   <downloadUrl>https://codeload.github.com/webaccess/com.webaccessglobal.moneris-eselect/zip/master</downloadUrl>
-  <file>Moneriseselect</file>
-  <name>Moneriseselect</name>
-  <description>Moneris eSelect hosted payment processor for CiviCRM</description>
+  <file>moneriseselect</file>
+  <name>MonerisEselect</name>
+  <label>Moneris Eselect Hosted</label>
+  <description>Eselect Moneris hosted payment processor for CiviCRM</description>
   <urls>
-    <url desc="Main Extension Page"></url>
-    <url desc="Documentation"></url>
-    <url desc="Support"></url>
-    <url desc="Licensing"></url>
+    <url desc="Main Extension Page">test</url>
   </urls>
   <license>AGPL</license>
   <maintainer>
     <author>Web Access</author>
     <email>info@webaccessglobal.com</email>
   </maintainer>
-  <releaseDate></releaseDate>
-  <version>1.0</version>
+  <releaseDate>2013-05-07</releaseDate>
+  <version>1.6</version>
   <develStage>alpha</develStage>
   <compatibility>
+    <ver>4.2</ver>
     <ver>4.3.3</ver>
   </compatibility>
-  <comments></comments>
-  <typeInfo>
-    <userNameLabel>HPP Key</userNameLabel>
-    <passwordLabel></passwordLabel>
-    <signatureLabel>PS Store ID</signatureLabel>
-    <subjectLabel></subjectLabel>
-    <urlSiteDefault>https://www3.moneris.com/</urlSiteDefault>
-    <urlApiDefault></urlApiDefault>
-    <urlRecurDefault></urlRecurDefault>
-    <urlSiteTestDefault>https://esqa.moneris.com/</urlSiteTestDefault>
-    <urlApiTestDefault></urlApiTestDefault>
-    <urlRecurTestDefault></urlRecurTestDefault>
-    <urlButtonDefault></urlButtonDefault>
-    <urlButtonTestDefault></urlButtonTestDefault>
-    <billingMode>notify</billingMode>
-    <isRecur></isRecur>
-    <paymentType>1</paymentType>
-  </typeInfo>
+  <comments>test</comments>
   <civix>
     <namespace>CRM</namespace>
   </civix>
