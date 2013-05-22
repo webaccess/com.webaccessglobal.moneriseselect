@@ -1,6 +1,6 @@
 <?php
 
-class moneriseselectIPN extends CRM_Core_Payment_BaseIPN {
+class com_webaccessglobal_moneriseselectIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
    * We only need one instance of this object. So we use the singleton
@@ -62,7 +62,7 @@ class moneriseselectIPN extends CRM_Core_Payment_BaseIPN {
    */
   static function &singleton($mode, $component, &$paymentProcessor) {
     if (self::$_singleton === null) {
-      self::$_singleton = new moneriseselectIPN($mode, $paymentProcessor);
+      self::$_singleton = new com_webaccessglobal_moneriseselectIPN($mode, $paymentProcessor);
     }
     return self::$_singleton;
   }
@@ -123,6 +123,8 @@ class moneriseselectIPN extends CRM_Core_Payment_BaseIPN {
       case 'Invalid-ReConfirmed':
         break;
       case 'Invalid':
+        return $this->cancelled($objects, $transaction);
+        break;
       case 'Invalid-Bad_Source':
       case 'Valid-Declined':
         return $this->failed($objects, $transaction);
