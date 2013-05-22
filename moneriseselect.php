@@ -29,6 +29,18 @@ function moneriseselect_civicrm_install() {
  * Implementation of hook_civicrm_uninstall
  */
 function moneriseselect_civicrm_uninstall() {
+
+  CRM_Core_DAO::executeQuery("DELETE pp FROM civicrm_payment_processor pp
+RIGHT JOIN  civicrm_payment_processor_type ppt ON ppt.id = pp.payment_processor_type_id
+WHERE ppt.name = 'MonerisEselect'");
+
+  $affectedRows = mysql_affected_rows();
+
+  if($affectedRows)
+    CRM_Core_Session::setStatus("Moneris Eselect Payment Processor Message:
+    <br />Entries for Moneris Eselect hosted Payment Processor are now Deleted!
+    <br />");
+
   return _moneriseselect_civix_civicrm_uninstall();
 }
 
@@ -36,6 +48,19 @@ function moneriseselect_civicrm_uninstall() {
  * Implementation of hook_civicrm_enable
  */
 function moneriseselect_civicrm_enable() {
+
+  CRM_Core_DAO::executeQuery("UPDATE civicrm_payment_processor pp
+RIGHT JOIN  civicrm_payment_processor_type ppt ON ppt.id = pp.payment_processor_type_id
+SET pp.is_active = 1
+WHERE ppt.name = 'MonerisEselect'");
+
+  $affectedRows = mysql_affected_rows();
+
+  if($affectedRows)
+    CRM_Core_Session::setStatus("Moneris Eselect Payment Processor Message:
+    <br />Entries for Moneris Eselect hosted Payment Processor are now Enabled!
+    <br />");
+
   return _moneriseselect_civix_civicrm_enable();
 }
 
@@ -43,6 +68,19 @@ function moneriseselect_civicrm_enable() {
  * Implementation of hook_civicrm_disable
  */
 function moneriseselect_civicrm_disable() {
+
+  CRM_Core_DAO::executeQuery("UPDATE civicrm_payment_processor pp
+RIGHT JOIN  civicrm_payment_processor_type ppt ON ppt.id = pp.payment_processor_type_id
+SET pp.is_active = 0
+WHERE ppt.name = 'MonerisEselect'");
+
+  $affectedRows = mysql_affected_rows();
+
+  if($affectedRows)
+    CRM_Core_Session::setStatus("Moneris Eselect Payment Processor Message:
+    <br />Entries for Moneris Eselect hosted Payment Processor are now Disabled!
+    <br />");
+
   return _moneriseselect_civix_civicrm_disable();
 }
 
