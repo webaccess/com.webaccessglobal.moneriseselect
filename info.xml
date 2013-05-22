@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<extension key="com.webaccessglobal.moneriseselect" type="module">
+  <downloadUrl>https://codeload.github.com/webaccess/com.webaccessglobal.moneris-eselect/zip/master</downloadUrl>
+  <file>moneriseselect</file>
+  <name>MonerisEselect</name>
+  <label>Moneris Eselect<label>
+  <description>Eselect Moneris hosted payment processor for CiviCRM</description>
+  <urls>
+    <url desc="Main Extension Page">test</url>
+  </urls>
+  <license>AGPL</license>
+  <maintainer>
+    <author>Web Access</author>
+    <email>info@webaccessglobal.com</email>
+  </maintainer>
+  <releaseDate>2013-05-07</releaseDate>
+  <version>1.6</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>4.2</ver>
+    <ver>4.3.3</ver>
+  </compatibility>
+  <comments>test</comments>
+  <civix>
+    <namespace>CRM/Stripe</namespace>
+  </civix>
+</extension>
